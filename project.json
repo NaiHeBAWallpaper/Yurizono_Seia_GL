@@ -69,6 +69,38 @@
 				"type" : "slider",
 				"value" : 61
 			},
+			"fireworks" : 
+			{
+				"index" : 13,
+				"order" : 113,
+				"text" : "Fireworks Effect",
+				"type" : "bool",
+				"value" : true
+			},
+			"fireworkstheme" : 
+			{
+				"condition" : "fireworks.value == true",
+				"index" : 14,
+				"options" : 
+				[
+					{
+						"label" : "Light",
+						"value" : "light"
+					},
+					{
+						"label" : "Dark",
+						"value" : "dark"
+					},
+					{
+						"label" : "Follow System",
+						"value" : "system"
+					}
+				],
+				"order" : 114,
+				"text" : "Fireworks Theme",
+				"type" : "combo",
+				"value" : "system"
+			},
 			"headpatting" : 
 			{
 				"condition" : "mouseactions.value == true",
@@ -175,8 +207,8 @@
 	"snapshotoverlay" : "",
 	"tags" : [ "Anime" ],
 	"title" : "Blue Archive | Yurizono Seia (GL)",
-	"type" : "web",
-	"version" : 3,
+	"type" : "Web",
+	"version" : 4,
 	"visibility" : "public",
 	"workshopid" : "3520791695",
 	"workshopurl" : "steam://url/CommunityFilePage/3520791695"
