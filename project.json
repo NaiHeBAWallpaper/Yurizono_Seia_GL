@@ -69,6 +69,15 @@
 				"type" : "slider",
 				"value" : 61
 			},
+			"drawHitboxes" : 
+			{
+				"condition" : "mouseactions.value == true",
+				"index" : 15,
+				"order" : 115,
+				"text" : "Interactive Area",
+				"type" : "bool",
+				"value" : false
+			},
 			"fireworks" : 
 			{
 				"index" : 13,
@@ -208,7 +217,7 @@
 	"tags" : [ "Anime" ],
 	"title" : "Blue Archive | Yurizono Seia (GL)",
 	"type" : "Web",
-	"version" : 4,
+	"version" : 5,
 	"visibility" : "public",
 	"workshopid" : "3520791695",
 	"workshopurl" : "steam://url/CommunityFilePage/3520791695"
