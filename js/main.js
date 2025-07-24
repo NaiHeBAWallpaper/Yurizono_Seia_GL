@@ -432,6 +432,15 @@ function init() {
 				bgmvolume = props.bgmvolume.value / 100;
 				if (bgm) bgm.volume = bgmvolume;
 			}
+		},
+		setPaused: function (isPaused) {
+			if (bgm) {
+				if (isPaused) {
+					setTimeout(() => { bgm.volume = 0; }, 200);
+				} else {
+					setTimeout(() => { bgm.volume = bgmvolume; }, 200);
+				}
+			}
 		}
 	};
 
