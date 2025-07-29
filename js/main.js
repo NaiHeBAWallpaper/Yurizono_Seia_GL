@@ -217,7 +217,12 @@ function playVoiceline() {
 
 	const timeout1 = setTimeout(function () {
 		acceptingClick = true;
-		currentVoiceline = clamp(currentVoiceline + 1, 0, AUDIO_DETAIL.length);
+		// 当达到末尾时循环回到第一句
+		if (currentVoiceline >= AUDIO_DETAIL.length) {
+			currentVoiceline = 1;
+		} else {
+			currentVoiceline = currentVoiceline + 1;
+		}
 	}, trackDetails.time);
 	voicelineTimeouts.push(timeout1);
 
