@@ -93,11 +93,25 @@ function renderParticle(anim) {
   });
 }
 
+
+let activeFireworksCount = 0;
+
 function animateParticles(x, y) {
   const circle = createCircle(x, y);
   const particles = Array.from({ length: config.numberOfParticles }, () => createParticle(x, y));
 
-  anime.timeline()
+  activeFireworksCount++;
+
+  anime.timeline({
+    complete: () => {
+      activeFireworksCount--;
+      if (activeFireworksCount <= 0) {
+        activeFireworksCount = 0;
+        fireworksRender.pause();
+        ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+      }
+    }
+  })
     .add({
       targets: particles,
       x(p) { return p.endPos.x },
@@ -124,13 +138,15 @@ function animateParticles(x, y) {
 
 const fireworksRender = anime({
   duration: Infinity,
+  autoplay: false,
   update: () => {
     ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
   }
 });
 
 function handleMouseDown(e) {
-  fireworksRender.play();
+  if (window.baPointerHandlesClicks?.()) return;
+  if (activeFireworksCount === 0) fireworksRender.play();
   updateCoords(e);
   animateParticles(pointerX, pointerY);
 }
@@ -140,9 +156,9 @@ if (!window.wallpaperPropertyListener) {
   window.wallpaperPropertyListener = {};
 }
 
-const originalApplyUserProperties = window.wallpaperPropertyListener.applyUserProperties || function() {};
+const originalApplyUserProperties = window.wallpaperPropertyListener.applyUserProperties || function () { };
 
-window.wallpaperPropertyListener.applyUserProperties = function(props) {
+window.wallpaperPropertyListener.applyUserProperties = function (props) {
   originalApplyUserProperties(props);
   if (props.fireworks) {
     if (props.fireworks.value) {
@@ -153,6 +169,16 @@ window.wallpaperPropertyListener.applyUserProperties = function(props) {
   }
   if (props.fireworkstheme) {
     updateTheme(props.fireworkstheme.value);
+  }
+};
+
+const originalSetPaused = window.wallpaperPropertyListener.setPaused || function () { };
+window.wallpaperPropertyListener.setPaused = function (isPaused) {
+  originalSetPaused(isPaused);
+  if (isPaused) {
+    fireworksRender.pause();
+  } else {
+    if (activeFireworksCount > 0) fireworksRender.play();
   }
 };
 
