@@ -4,248 +4,433 @@
 	"file" : "index.html",
 	"general" : 
 	{
-		"properties" : 
-		{
-			"bapointer" : 
-			{
-				"index": 17,
-				"order": 117,
-				"text": "BA Pointer Style",
-				"type": "bool",
-				"value": true
-			},
-			"bapersistenttrail" : 
-			{
-				"condition": "fireworks.value == true && bapointer.value == true",
-				"index": 18,
-				"order": 118,
-				"text": "BA Pointer Persistent Trail",
-				"type": "bool",
-				"value": false
-			},
-			"bgmvolume" : 
-			{
-				"fraction" : false,
-				"index" : 13,
-				"max" : 100,
-				"min" : 0,
-				"order" : 113,
-				"text" : "BGM Volume",
-				"type" : "slider",
-				"value" : 20
-			},
-			"dialoglanguage" : 
-			{
-				"condition" : "mouseactions.value == true && voicelines.value == true && showdialog.value == true",
-				"index" : 8,
-				"options" : 
-				[
-					{
-						"label" : "Japanese",
-						"value" : "Japanese"
-					},
-					{
-						"label" : "English",
-						"value" : "English"
-					},
-					{
-						"label" : "Chinese",
-						"value" : "Chinese"
-					}
-				],
-				"order" : 108,
-				"text" : "Dialog Language",
-				"type" : "combo",
-				"value" : "Japanese"
-			},
-			"dialogx" : 
-			{
-				"condition" : "mouseactions.value == true && voicelines.value == true && showdialog.value == true",
-				"fraction" : true,
-				"index" : 9,
-				"max" : 100,
-				"min" : 0,
-				"order" : 109,
-				"precision" : 2,
-				"step" : 0.1,
-				"text" : "DialogX",
-				"type" : "slider",
-				"value" : 51
-			},
-			"dialogy" : 
-			{
-				"condition" : "mouseactions.value == true && voicelines.value == true && showdialog.value == true",
-				"fraction" : true,
-				"index" : 10,
-				"max" : 100,
-				"min" : 0,
-				"order" : 110,
-				"precision" : 2,
-				"step" : 0.1,
-				"text" : "DialogY",
-				"type" : "slider",
-				"value" : 61
-			},
-			"drawHitboxes" : 
-			{
-				"condition" : "mouseactions.value == true",
-				"index" : 16,
-				"order" : 116,
-				"text" : "Interactive Area",
-				"type" : "bool",
-				"value" : false
-			},
-			"fireworks" : 
-			{
-				"index" : 14,
-				"order" : 114,
-				"text" : "Click Effects",
-				"type" : "bool",
-				"value" : true
-			},
-			"fireworkstheme" : 
-			{
-				"condition" : "fireworks.value == true && bapointer.value == false",
-				"index" : 15,
-				"options" : 
-				[
-					{
-						"label" : "Light",
-						"value" : "light"
-					},
-					{
-						"label" : "Dark",
-						"value" : "dark"
-					},
-					{
-						"label" : "Follow System",
-						"value" : "system"
-					}
-				],
-				"order" : 115,
-				"text" : "Fireworks Theme",
-				"type" : "combo",
-				"value" : "system"
-			},
-			"headpatting" : 
-			{
-				"condition" : "mouseactions.value == true",
-				"index" : 11,
-				"order" : 111,
-				"text" : "Headpatting",
-				"type" : "bool",
-				"value" : true
-			},
-			"introanimation" : 
-			{
-				"index" : 3,
-				"order" : 103,
-				"text" : "Intro Animation",
-				"type" : "bool",
-				"value" : true
-			},
-			"modelresolution" : 
-			{
-				"index" : 1,
-				"options" : 
-				[
-					{
-						"label" : "2K",
-						"value" : "2k"
-					},
-					{
-						"label" : "4K",
-						"value" : "4k"
-					},
-					{
-						"label" : "8K",
-						"value" : "8k"
-					}
-				],
-				"order" : 101,
-				"text" : "Model Resolution",
-				"type" : "combo",
-				"value" : "8k"
-			},
-			"mouseactions" : 
-			{
-				"index" : 4,
-				"order" : 104,
-				"text" : "Show Mouse Actions",
-				"type" : "bool",
-				"value" : false
-			},
-			"mousetracking" : 
-			{
-				"condition" : "mouseactions.value == true",
-				"index" : 12,
-				"order" : 112,
-				"text" : "Mouse Tracking",
-				"type" : "bool",
-				"value" : true
-			},
-			"scale" : 
-			{
-				"fraction" : true,
-				"index" : 0,
-				"max" : 2,
-				"min" : 0.7,
-				"order" : 100,
-				"precision" : 3,
-				"step" : 0.01,
-				"text" : "Scale",
-				"type" : "slider",
-				"value" : 0.8
-			},
-			"schemecolor" : 
-			{
+		"properties" : {
+			"schemecolor" : {
 				"order" : 0,
 				"text" : "ui_browse_properties_scheme_color",
 				"type" : "color",
 				"value" : "0 0 0"
 			},
-			"showdialog" : 
-			{
-				"condition" : "mouseactions.value == true && voicelines.value == true",
-				"index" : 7,
-				"order" : 107,
-				"text" : "Show Dialog",
-				"type" : "bool",
-				"value" : true
+			"scale" : {
+				"fraction" : true,
+				"index" : 0,
+				"max" : 2,
+				"min" : 0.1,
+				"order" : 100,
+				"precision" : 3,
+				"step" : 0.01,
+				"text" : "ui_kei_scale",
+				"type" : "slider",
+				"value" : 0.8
 			},
-			"targetfps" : 
-			{
+			"positionx" : {
+				"fraction" : false,
+				"index" : 19,
+				"max" : 50,
+				"min" : -50,
+				"order" : 101,
+				"text" : "ui_kei_positionx",
+				"type" : "slider",
+				"value" : 0
+			},
+			"positiony" : {
+				"fraction" : false,
+				"index" : 20,
+				"max" : 50,
+				"min" : -50,
+				"order" : 102,
+				"text" : "ui_kei_positiony",
+				"type" : "slider",
+				"value" : 0
+			},
+			"modelresolution" : {
+				"index" : 1,
+				"options" : [
+					{
+						"label" : "ui_kei_modelresolution_2k",
+						"value" : "2k"
+					},
+					{
+						"label" : "ui_kei_modelresolution_4k",
+						"value" : "4k"
+					},
+					{
+						"label" : "ui_kei_modelresolution_8k",
+						"value" : "8k"
+					}
+				],
+				"order" : 103,
+				"text" : "ui_kei_modelresolution",
+				"type" : "combo",
+				"value" : "8k"
+			},
+			"targetfps" : {
 				"fraction" : false,
 				"index" : 2,
 				"max" : 144,
 				"min" : 30,
-				"order" : 102,
-				"text" : "Target FPS",
+				"order" : 104,
+				"text" : "ui_kei_targetfps",
 				"type" : "slider",
 				"value" : 60
 			},
-			"voicelines" : 
-			{
-				"condition" : "mouseactions.value == true",
-				"index" : 5,
+			"introanimation" : {
+				"index" : 3,
 				"order" : 105,
-				"text" : "Voicelines",
+				"text" : "ui_kei_introanimation",
 				"type" : "bool",
 				"value" : true
 			},
-			"voicevolume" : 
-			{
+			"mouseactions" : {
+				"index" : 4,
+				"order" : 106,
+				"text" : "ui_kei_mouseactions",
+				"type" : "bool",
+				"value" : false
+			},
+			"voicelines" : {
+				"condition" : "mouseactions.value == true",
+				"index" : 5,
+				"order" : 107,
+				"text" : "ui_kei_voicelines",
+				"type" : "bool",
+				"value" : true
+			},
+			"dialoglanguage" : {
+				"condition" : "mouseactions.value == true && voicelines.value == true",
+				"index" : 8,
+				"options" : [
+					{
+						"label" : "ui_kei_subtitlelanguage_auto",
+						"value" : "auto"
+					},
+					{
+						"label" : "ui_kei_subtitlelanguage_english",
+						"value" : "English"
+					},
+					{
+						"label" : "ui_kei_subtitlelanguage_chinese",
+						"value" : "Chinese"
+					},
+					{
+						"label" : "ui_kei_subtitlelanguage_traditionalchinese",
+						"value" : "TraditionalChinese"
+					},
+					{
+						"label" : "ui_kei_subtitlelanguage_japanese",
+						"value" : "Japanese"
+					},
+					{
+						"label" : "ui_kei_subtitlelanguage_korean",
+						"value" : "Korean"
+					}
+				],
+				"order" : 108,
+				"text" : "ui_kei_subtitlelanguage",
+				"type" : "combo",
+				"value" : "auto"
+			},
+			"voicevolume" : {
 				"condition" : "mouseactions.value == true && voicelines.value == true",
 				"fraction" : true,
 				"index" : 6,
 				"max" : 100,
 				"min" : 0,
-				"order" : 106,
+				"order" : 109,
 				"precision" : 2,
 				"step" : 0.1,
-				"text" : "Volume",
+				"text" : "ui_kei_voicevolume",
 				"type" : "slider",
 				"value" : 20
+			},
+			"showdialog" : {
+				"condition" : "mouseactions.value == true && voicelines.value == true",
+				"index" : 7,
+				"order" : 110,
+				"text" : "ui_kei_showdialog",
+				"type" : "bool",
+				"value" : true
+			},
+			"dialogx" : {
+				"condition" : "mouseactions.value == true && voicelines.value == true && showdialog.value == true",
+				"fraction" : true,
+				"index" : 9,
+				"max" : 100,
+				"min" : 0,
+				"order" : 111,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "ui_kei_dialogx",
+				"type" : "slider",
+				"value" : 51
+			},
+			"dialogy" : {
+				"condition" : "mouseactions.value == true && voicelines.value == true && showdialog.value == true",
+				"fraction" : true,
+				"index" : 10,
+				"max" : 100,
+				"min" : 0,
+				"order" : 112,
+				"precision" : 2,
+				"step" : 0.1,
+				"text" : "ui_kei_dialogy",
+				"type" : "slider",
+				"value" : 61
+			},
+			"headpatting" : {
+				"condition" : "mouseactions.value == true",
+				"index" : 11,
+				"order" : 113,
+				"text" : "ui_kei_headpatting",
+				"type" : "bool",
+				"value" : true
+			},
+			"mousetracking" : {
+				"condition" : "mouseactions.value == true",
+				"index" : 12,
+				"order" : 114,
+				"text" : "ui_kei_mousetracking",
+				"type" : "bool",
+				"value" : true
+			},
+			"bgmvolume" : {
+				"fraction" : false,
+				"index" : 13,
+				"max" : 100,
+				"min" : 0,
+				"order" : 115,
+				"text" : "ui_kei_bgmvolume",
+				"type" : "slider",
+				"value" : 20
+			},
+			"fireworks" : {
+				"index" : 14,
+				"order" : 116,
+				"text" : "ui_kei_fireworks",
+				"type" : "bool",
+				"value" : true
+			},
+			"fireworkstheme" : {
+				"condition" : "fireworks.value == true && bapointer.value == false",
+				"index" : 15,
+				"options" : [
+					{
+						"label" : "ui_kei_fireworkstheme_light",
+						"value" : "light"
+					},
+					{
+						"label" : "ui_kei_fireworkstheme_dark",
+						"value" : "dark"
+					},
+					{
+						"label" : "ui_kei_fireworkstheme_system",
+						"value" : "system"
+					}
+				],
+				"order" : 117,
+				"text" : "ui_kei_fireworkstheme",
+				"type" : "combo",
+				"value" : "system"
+			},
+			"drawHitboxes" : {
+				"condition" : "mouseactions.value == true",
+				"index" : 16,
+				"order" : 118,
+				"text" : "ui_kei_drawhitboxes",
+				"type" : "bool",
+				"value" : false
+			},
+			"bapointer" : {
+				"index" : 17,
+				"order" : 119,
+				"text" : "ui_kei_bapointer",
+				"type" : "bool",
+				"value" : true
+			},
+			"bapersistenttrail" : {
+				"condition" : "fireworks.value == true && bapointer.value == true",
+				"index" : 18,
+				"order" : 120,
+				"text" : "ui_kei_bapersistenttrail",
+				"type" : "bool",
+				"value" : false
+			}
+		},
+		"localization" : {
+			"en-us" : {
+				"ui_kei_scale" : "Scale",
+				"ui_kei_positionx" : "Position X (%)",
+				"ui_kei_positiony" : "Position Y (%)",
+				"ui_kei_modelresolution" : "Model Resolution",
+				"ui_kei_modelresolution_2k" : "2K",
+				"ui_kei_modelresolution_4k" : "4K",
+				"ui_kei_modelresolution_8k" : "8K",
+				"ui_kei_targetfps" : "Target FPS",
+				"ui_kei_introanimation" : "Intro Animation",
+				"ui_kei_mouseactions" : "Show Mouse Actions",
+				"ui_kei_voicelines" : "Voice Lines",
+				"ui_kei_subtitlelanguage" : "Subtitle Language",
+				"ui_kei_subtitlelanguage_auto" : "Follow Interface Language",
+				"ui_kei_subtitlelanguage_english" : "English",
+				"ui_kei_subtitlelanguage_chinese" : "Simplified Chinese",
+				"ui_kei_subtitlelanguage_traditionalchinese" : "Traditional Chinese",
+				"ui_kei_subtitlelanguage_japanese" : "Japanese",
+				"ui_kei_subtitlelanguage_korean" : "Korean",
+				"ui_kei_voicevolume" : "Voice Volume",
+				"ui_kei_showdialog" : "Show Subtitles",
+				"ui_kei_dialogx" : "Subtitle X Position (%)",
+				"ui_kei_dialogy" : "Subtitle Y Position (%)",
+				"ui_kei_headpatting" : "Headpatting",
+				"ui_kei_mousetracking" : "Mouse Tracking",
+				"ui_kei_bgmvolume" : "BGM Volume",
+				"ui_kei_fireworks" : "Click Effects",
+				"ui_kei_fireworkstheme" : "Fireworks Theme",
+				"ui_kei_fireworkstheme_light" : "Light",
+				"ui_kei_fireworkstheme_dark" : "Dark",
+				"ui_kei_fireworkstheme_system" : "Follow System",
+				"ui_kei_drawhitboxes" : "Show Interaction Areas",
+				"ui_kei_bapointer" : "BA Pointer Style",
+				"ui_kei_bapersistenttrail" : "BA Pointer Persistent Trail"
+			},
+			"zh-chs" : {
+				"ui_kei_scale" : "缩放",
+				"ui_kei_positionx" : "X 位置 (%)",
+				"ui_kei_positiony" : "Y 位置 (%)",
+				"ui_kei_modelresolution" : "模型分辨率",
+				"ui_kei_modelresolution_2k" : "2K",
+				"ui_kei_modelresolution_4k" : "4K",
+				"ui_kei_modelresolution_8k" : "8K",
+				"ui_kei_targetfps" : "目标帧率",
+				"ui_kei_introanimation" : "入场动画",
+				"ui_kei_mouseactions" : "显示鼠标交互选项",
+				"ui_kei_voicelines" : "角色语音",
+				"ui_kei_subtitlelanguage" : "字幕语言",
+				"ui_kei_subtitlelanguage_auto" : "跟随界面语言",
+				"ui_kei_subtitlelanguage_english" : "英语",
+				"ui_kei_subtitlelanguage_chinese" : "简体中文",
+				"ui_kei_subtitlelanguage_traditionalchinese" : "繁体中文",
+				"ui_kei_subtitlelanguage_japanese" : "日语",
+				"ui_kei_subtitlelanguage_korean" : "韩语",
+				"ui_kei_voicevolume" : "语音音量",
+				"ui_kei_showdialog" : "显示字幕",
+				"ui_kei_dialogx" : "字幕 X 位置 (%)",
+				"ui_kei_dialogy" : "字幕 Y 位置 (%)",
+				"ui_kei_headpatting" : "摸头",
+				"ui_kei_mousetracking" : "视线跟随鼠标",
+				"ui_kei_bgmvolume" : "背景音乐音量",
+				"ui_kei_fireworks" : "点击特效",
+				"ui_kei_fireworkstheme" : "烟花主题",
+				"ui_kei_fireworkstheme_light" : "浅色",
+				"ui_kei_fireworkstheme_dark" : "深色",
+				"ui_kei_fireworkstheme_system" : "跟随系统",
+				"ui_kei_drawhitboxes" : "显示交互区域",
+				"ui_kei_bapointer" : "BA 指针样式",
+				"ui_kei_bapersistenttrail" : "BA 指针常驻尾迹"
+			},
+			"ja-jp" : {
+				"ui_kei_scale" : "拡大率",
+				"ui_kei_positionx" : "横位置 (%)",
+				"ui_kei_positiony" : "縦位置 (%)",
+				"ui_kei_modelresolution" : "モデル解像度",
+				"ui_kei_modelresolution_2k" : "2K",
+				"ui_kei_modelresolution_4k" : "4K",
+				"ui_kei_modelresolution_8k" : "8K",
+				"ui_kei_targetfps" : "目標 FPS",
+				"ui_kei_introanimation" : "イントロアニメーション",
+				"ui_kei_mouseactions" : "マウス操作の設定を表示",
+				"ui_kei_voicelines" : "キャラクターボイス",
+				"ui_kei_subtitlelanguage" : "字幕の言語",
+				"ui_kei_subtitlelanguage_auto" : "インターフェースの言語に合わせる",
+				"ui_kei_subtitlelanguage_english" : "英語",
+				"ui_kei_subtitlelanguage_chinese" : "簡体字中国語",
+				"ui_kei_subtitlelanguage_traditionalchinese" : "繁体字中国語",
+				"ui_kei_subtitlelanguage_japanese" : "日本語",
+				"ui_kei_subtitlelanguage_korean" : "韓国語",
+				"ui_kei_voicevolume" : "ボイス音量",
+				"ui_kei_showdialog" : "字幕を表示",
+				"ui_kei_dialogx" : "字幕の横位置 (%)",
+				"ui_kei_dialogy" : "字幕の縦位置 (%)",
+				"ui_kei_headpatting" : "頭をなでる",
+				"ui_kei_mousetracking" : "視線でカーソルを追う",
+				"ui_kei_bgmvolume" : "BGM 音量",
+				"ui_kei_fireworks" : "クリックエフェクト",
+				"ui_kei_fireworkstheme" : "花火エフェクトのテーマ",
+				"ui_kei_fireworkstheme_light" : "ライト",
+				"ui_kei_fireworkstheme_dark" : "ダーク",
+				"ui_kei_fireworkstheme_system" : "システムに合わせる",
+				"ui_kei_drawhitboxes" : "インタラクション範囲を表示",
+				"ui_kei_bapointer" : "BA ポインタースタイル",
+				"ui_kei_bapersistenttrail" : "BA ポインターの軌跡を常時表示"
+			},
+			"zh-cht" : {
+				"ui_kei_scale" : "縮放",
+				"ui_kei_positionx" : "X 位置 (%)",
+				"ui_kei_positiony" : "Y 位置 (%)",
+				"ui_kei_modelresolution" : "模型解析度",
+				"ui_kei_modelresolution_2k" : "2K",
+				"ui_kei_modelresolution_4k" : "4K",
+				"ui_kei_modelresolution_8k" : "8K",
+				"ui_kei_targetfps" : "目標影格率",
+				"ui_kei_introanimation" : "進場動畫",
+				"ui_kei_mouseactions" : "顯示滑鼠互動選項",
+				"ui_kei_voicelines" : "角色語音",
+				"ui_kei_subtitlelanguage" : "字幕語言",
+				"ui_kei_subtitlelanguage_auto" : "跟隨介面語言",
+				"ui_kei_subtitlelanguage_english" : "英語",
+				"ui_kei_subtitlelanguage_chinese" : "簡體中文",
+				"ui_kei_subtitlelanguage_traditionalchinese" : "繁體中文",
+				"ui_kei_subtitlelanguage_japanese" : "日語",
+				"ui_kei_subtitlelanguage_korean" : "韓語",
+				"ui_kei_voicevolume" : "語音音量",
+				"ui_kei_showdialog" : "顯示字幕",
+				"ui_kei_dialogx" : "字幕 X 位置 (%)",
+				"ui_kei_dialogy" : "字幕 Y 位置 (%)",
+				"ui_kei_headpatting" : "摸頭",
+				"ui_kei_mousetracking" : "視線跟隨滑鼠",
+				"ui_kei_bgmvolume" : "背景音樂音量",
+				"ui_kei_fireworks" : "點擊特效",
+				"ui_kei_fireworkstheme" : "煙火主題",
+				"ui_kei_fireworkstheme_light" : "淺色",
+				"ui_kei_fireworkstheme_dark" : "深色",
+				"ui_kei_fireworkstheme_system" : "跟隨系統",
+				"ui_kei_drawhitboxes" : "顯示互動區域",
+				"ui_kei_bapointer" : "BA 指標樣式",
+				"ui_kei_bapersistenttrail" : "BA 指標常駐軌跡"
+			},
+			"ko-kr" : {
+				"ui_kei_scale" : "확대/축소",
+				"ui_kei_positionx" : "가로 위치 (%)",
+				"ui_kei_positiony" : "세로 위치 (%)",
+				"ui_kei_modelresolution" : "모델 해상도",
+				"ui_kei_modelresolution_2k" : "2K",
+				"ui_kei_modelresolution_4k" : "4K",
+				"ui_kei_modelresolution_8k" : "8K",
+				"ui_kei_targetfps" : "목표 프레임 속도",
+				"ui_kei_introanimation" : "인트로 애니메이션",
+				"ui_kei_mouseactions" : "마우스 상호작용 설정 표시",
+				"ui_kei_voicelines" : "캐릭터 음성",
+				"ui_kei_subtitlelanguage" : "자막 언어",
+				"ui_kei_subtitlelanguage_auto" : "인터페이스 언어 따르기",
+				"ui_kei_subtitlelanguage_english" : "영어",
+				"ui_kei_subtitlelanguage_chinese" : "중국어 간체",
+				"ui_kei_subtitlelanguage_traditionalchinese" : "중국어 번체",
+				"ui_kei_subtitlelanguage_japanese" : "일본어",
+				"ui_kei_subtitlelanguage_korean" : "한국어",
+				"ui_kei_voicevolume" : "음성 음량",
+				"ui_kei_showdialog" : "자막 표시",
+				"ui_kei_dialogx" : "자막 가로 위치 (%)",
+				"ui_kei_dialogy" : "자막 세로 위치 (%)",
+				"ui_kei_headpatting" : "머리 쓰다듬기",
+				"ui_kei_mousetracking" : "시선으로 마우스 포인터 따라가기",
+				"ui_kei_bgmvolume" : "배경 음악 음량",
+				"ui_kei_fireworks" : "클릭 효과",
+				"ui_kei_fireworkstheme" : "불꽃 효과 테마",
+				"ui_kei_fireworkstheme_light" : "라이트",
+				"ui_kei_fireworkstheme_dark" : "다크",
+				"ui_kei_fireworkstheme_system" : "시스템 설정 따르기",
+				"ui_kei_drawhitboxes" : "상호작용 영역 표시",
+				"ui_kei_bapointer" : "BA 포인터 스타일",
+				"ui_kei_bapersistenttrail" : "BA 포인터 궤적 항상 표시"
 			}
 		}
 	},

@@ -44,3 +44,11 @@ body {
   border: 10px solid;
   border-color: transparent transparent transparent rgba(255,255,255,0.9) ;
 } */
+
+.textbox:lang(zh-Hant) {
+  font-family: 'Microsoft JhengHei', NotoSans, sans-serif;
+}
+
+.textbox:lang(ko) {
+  font-family: 'Malgun Gothic', NotoSans, sans-serif;
+}

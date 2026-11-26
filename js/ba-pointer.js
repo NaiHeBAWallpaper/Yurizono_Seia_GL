@@ -14,6 +14,7 @@
     const fragmentSize = [18, 48];
     const trailLifetime = 300;
     const maxTrailPoints = 320;
+    const maxTrailSubdivisions = 6;
     const white = [1, 1, 1];
     const flashBlue = [0.24056602, 0.39061815, 1];
     const ringBlue = [76 / 255, 167 / 255, 1];
@@ -34,6 +35,44 @@
     const smooth = t => t * t * (3 - 2 * t);
     const range = (min, max) => min + Math.random() * (max - min);
     const turn = Math.PI * 2;
+
+    function smoothTrail(points) {
+      const directions = points.slice(1).map((point, i) => {
+        const dx = point.x - points[i].x, dy = point.y - points[i].y;
+        const length = Math.hypot(dx, dy);
+        return { x: dx / length, y: dy / length, length };
+      });
+      const curve = [points[0]];
+      for (let i = 0; i < directions.length; i++) {
+        const from = points[i], to = points[i + 1];
+        const direction = directions[i];
+        const prev = directions[i - 1] ?? direction;
+        const next = directions[i + 1] ?? direction;
+        // Keep each tangent short when either neighboring mouse sample is close.
+        const startLength = Math.min(prev.length, direction.length) / 6;
+        const endLength = Math.min(direction.length, next.length) / 6;
+        const x1 = from.x + (prev.x + direction.x) * startLength;
+        const y1 = from.y + (prev.y + direction.y) * startLength;
+        const x2 = to.x - (direction.x + next.x) * endLength;
+        const y2 = to.y - (direction.y + next.y) * endLength;
+        const bend = Math.max(
+          Math.abs(direction.x * (y1 - from.y) - direction.y * (x1 - from.x)),
+          Math.abs(direction.x * (y2 - to.y) - direction.y * (x2 - to.x))
+        );
+        const subdivisions = Math.min(maxTrailSubdivisions, Math.ceil(Math.sqrt(bend / 0.2)));
+        for (let step = 1; step < subdivisions; step++) {
+          const t = step / subdivisions;
+          const s = 1 - t;
+          curve.push({
+            x: s ** 3 * from.x + 3 * s * s * t * x1 + 3 * s * t * t * x2 + t ** 3 * to.x,
+            y: s ** 3 * from.y + 3 * s * s * t * y1 + 3 * s * t * t * y2 + t ** 3 * to.y,
+            time: lerp(from.time, to.time, t)
+          });
+        }
+        curve.push(to);
+      }
+      return curve;
+    }
 
     function hermite(from, to, outgoing, incoming, t, duration) {
       t = clamp(t);
@@ -131,7 +170,8 @@
           float edge = length(vec2(uv.x, (uv.y - 0.5) * 2.0));
           float fade = 1.0 - smoothstep(0.15, 1.0, lifetime);
           float aging = smoothstep(0.38, 0.91, lifetime);
-          float coreWidth = mix(0.075, 0.035, aging);
+          float headWidth = 1.0 + 0.32 * (1.0 - smoothstep(0.0, 0.14, lifetime));
+          float coreWidth = mix(0.075, 0.035, aging) * headWidth;
           float coreMask = texture(source, vec2(0.5, 0.5 + edge * 0.5 / coreWidth)).a;
           float core = coreMask * (1.0 - smoothstep(coreWidth * 0.6, coreWidth, edge)) * fade;
           float halo = (1.0 - smoothstep(0.0, 1.0, edge)) * exp(-1.3 * edge * edge) *
@@ -141,7 +181,7 @@
           vec3 haloTint = vec3(0.14, 0.22, 2.15);
           float alpha = core + halo * (1.0 - core);
           if (alpha < 0.0001) discard;
-          result = vec4((coreTint * core + haloTint * halo * (1.0 - core)) / alpha, alpha);
+          result = vec4(coreTint * core + haloTint * halo * (1.0 - core), alpha);
           return;
         }
         float mask = texture(source, uv).a;
@@ -316,7 +356,7 @@
       const quad = geometry(new Float32Array([-0.5, -0.5, 0, 0, 0.5, -0.5, 1, 0,
         -0.5, 0.5, 0, 1, 0.5, 0.5, 1, 1]), gl.TRIANGLE_STRIP);
       const ring = geometry(new Float32Array(ringVertices(assets.mesh)), gl.TRIANGLES);
-      const trailData = new Float32Array((maxTrailPoints + 1) * 2 * 5);
+      const trailData = new Float32Array((maxTrailPoints - 1) * maxTrailSubdivisions * 10 * 5);
       const ribbon = geometry(trailData, gl.TRIANGLE_STRIP, 5);
       const fullscreen = gl.createVertexArray();
       let background, foreground, down = [], up = [];
@@ -388,7 +428,9 @@
         const isTrail = name === "trail";
         const mesh = isTrail ? ribbon : name === "ring" ? ring : quad;
         const { u } = scene;
-        gl.blendFuncSeparate(gl.SRC_ALPHA, isTrail ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        // Trail capsules overlap at turns. Keep their brightest coverage without adding it.
+        if (isTrail) gl.blendEquation(gl.MAX);
+        else gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.uniform2f(u.center, x, y);
         gl.uniform1f(u.scale, size);
         gl.uniform1f(u.rotation, rotation);
@@ -400,43 +442,37 @@
         bindTexture(0, tex[name]);
         gl.bindVertexArray(mesh.vao);
         gl.drawArrays(mesh.mode, 0, mesh.count);
+        if (isTrail) gl.blendEquation(gl.FUNC_ADD);
       }
 
       function drawTrail(points, now) {
         const halfWidth = 29;
-        const v = 0.5 / tex.trail.height;
-        const normals = [];
-        for (let i = 1; i < points.length; i++) {
-          const dx = points[i].x - points[i - 1].x;
-          const dy = points[i].y - points[i - 1].y;
+        const curve = smoothTrail(points);
+        let offset = 0;
+        for (let i = 1; i < curve.length; i++) {
+          const from = curve[i - 1], to = curve[i];
+          const dx = to.x - from.x, dy = to.y - from.y;
           const length = Math.hypot(dx, dy);
-          normals.push([-dy / length, dx / length]);
-        }
-        for (let i = 0; i < points.length; i++) {
-          const prev = normals[Math.max(0, i - 1)];
-          const next = normals[Math.min(i, normals.length - 1)];
-          let mx = prev[0] + next[0], my = prev[1] + next[1];
-          const length = Math.hypot(mx, my);
-          if (length < 0.01) {
-            [mx, my] = next;
-          } else {
-            mx /= length;
-            my /= length;
+          const tx = dx / length * halfWidth, ty = dy / length * halfWidth;
+          const fromAge = clamp((now - from.time) / trailLifetime);
+          const toAge = clamp((now - to.time) / trailLifetime);
+          const first = offset;
+          offset += 5;
+          for (let column = 0; column < 4; column++) {
+            const point = column < 2 ? from : to;
+            const age = column < 2 ? fromAge : toAge;
+            const cap = column === 0 ? -1 : column === 3 ? 1 : 0;
+            const x = point.x + tx * cap, y = point.y + ty * cap;
+            trailData.set([x - ty, y + tx, cap, 0, age,
+                           x + ty, y - tx, cap, 1, age], offset);
+            offset += 10;
           }
-          const miterWidth = Math.min(halfWidth / Math.max(0.35, Math.abs(mx * next[0] + my * next[1])), halfWidth * 2);
-          const { x, y, time } = points[i];
-          const age = clamp((now - time) / trailLifetime);
-          trailData.set([x + mx * miterWidth, y + my * miterWidth, 0, v, age,
-                         x - mx * miterWidth, y - my * miterWidth, 0, 1 - v, age], i * 10);
+          // Duplicate the endpoints so adjacent capsules share no strip triangles.
+          trailData.copyWithin(first, first + 5, first + 10);
+          trailData.copyWithin(offset, offset - 5, offset);
+          offset += 5;
         }
-        // Extend the strip past the head so the shader can round the glow.
-        const head = points.at(-1);
-        const [nx, ny] = normals.at(-1);
-        const x = head.x + ny * halfWidth, y = head.y - nx * halfWidth;
-        const age = clamp((now - head.time) / trailLifetime);
-        trailData.set([x + nx * halfWidth, y + ny * halfWidth, 1, v, age,
-                       x - nx * halfWidth, y - ny * halfWidth, 1, 1 - v, age], points.length * 10);
-        ribbon.count = (points.length + 1) * 2;
+        ribbon.count = offset / 5;
         gl.bindBuffer(gl.ARRAY_BUFFER, ribbon.buffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, trailData, 0, ribbon.count * 5);
         draw("trail", 0, 0, 1, 0, trailCyan, 1, 1, 0);

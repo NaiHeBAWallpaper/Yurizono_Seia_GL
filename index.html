@@ -8,8 +8,14 @@
         background: #4d4d4d var(--wallpaper-cover, url("assets/loading.jpg")) center / cover no-repeat fixed;
         /* The loading frame was captured at a wallpaper scale of 0.7. */
         background-size: calc(max(100vw, 160vh) * var(--wallpaper-scale, 0.8) / 0.7) auto;
+        background-position: calc(50% + var(--wallpaper-position-x, 0px)) calc(50% + var(--wallpaper-position-y, 0px));
       }
-      #canvas { visibility: hidden; }
+      #canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        visibility: hidden;
+      }
     </style>
     <link rel="preload" href="assets/loading.jpg" as="image">
     <link rel="stylesheet" type="text/css" href="css/style.css">
