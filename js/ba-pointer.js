@@ -10,20 +10,22 @@
 
     // WinUI defaults from PointerSettings.cs and DCompositionRenderer.cs, at 96 DPI.
     const pixels = 720 * 0.5;
+    const clickScale = 1.65;
+    const fragmentSize = [18, 48];
     const trailLifetime = 300;
     const maxTrailPoints = 320;
     const white = [1, 1, 1];
     const flashBlue = [0.24056602, 0.39061815, 1];
     const ringBlue = [76 / 255, 167 / 255, 1];
-    const trailBlue = [0, 0.39058137, 1];
-    const fragmentTimes = [11951, 18504, 30262, 43369, 54163].map(time => time / 65535);
+    const trailCyan = [0.075, 5.2, 7.25];
+    const fragmentTimes = [0, 0.15, 0.37, 0.65, 1];
     const fragmentColors = [
-      white,
-      [0.3726415, 0.7731873, 1],
-      [0.3725490, 0.7725491, 1],
-      [0.3529412, 0.7294118, 0.9450981],
-      [0.3725490, 0.7725491, 1]
-    ];
+      [255, 255, 255],
+      [228, 255, 255],
+      [182, 255, 255],
+      [154, 231, 255],
+      [131, 200, 255]
+    ].map(color => color.map(channel => ((channel / 255 + 0.055) / 1.055) ** 2.4));
     const blinkTimes = [0, 0.2882, 0.3647, 0.4706, 0.5734, 0.6676, 0.7561, 0.8529, 1];
     const blinkValues = [1, 1, 0, 1, 0, 1, 0, 1, 1];
     const clamp = value => Math.max(0, Math.min(1, value));
@@ -70,45 +72,31 @@
       return values.at(-1);
     }
 
-    function makeFragment(x, y, start, moving) {
+    function makeFragment(x, y, start) {
       const angle = range(0, turn);
       const dx = Math.cos(angle);
       const dy = Math.sin(angle);
-      let offsetX, offsetY;
-      if (moving) {
-        const root = Math.sqrt(Math.random());
-        const a = 1 - root;
-        const b = root * (1 - Math.random());
-        const c = 1 - a - b;
-        offsetX = (a * 0.099028 - b * 0.146066 + c * 0.099028) * 0.15;
-        offsetY = (a - c) * 0.134899 * 0.15;
-      } else {
-        const radius = range(0.09, 0.098);
-        offsetX = dx * radius;
-        offsetY = dy * radius;
-      }
+      const radius = range(0.09, 0.098) * pixels * clickScale;
       return {
-        x: x + offsetX * pixels, y: y + offsetY * pixels, start, dx, dy,
-        lifetime: moving ? range(200, 400) : range(600, 700),
-        speed: moving ? range(0.067, 0.1) : range(0.09, 0.13),
-        size: range(0.1, 0.2) * pixels * 0.3078824 * 1.2,
+        x: x + dx * radius, y: y + dy * radius, start, dx, dy,
+        lifetime: range(600, 700),
+        speed: range(0.09, 0.13) * clickScale,
+        size: range(...fragmentSize),
         frame: Math.random() < 0.5 ? 0 : 0.5
       };
     }
 
-    function drawFragment(renderer, particle, now) {
+    function drawFragment(renderer, particle, now, moving) {
       const age = Math.max(0, now - particle.start);
       const t = age / particle.lifetime;
       if (t >= 1) return;
       const growth = t <= 0.15445 ? smooth(t / 0.15445) : 1 - smooth((t - 0.15445) / 0.84555);
       const distance = particle.speed * age / 1000 * pixels;
-      const [from, to] = fragmentTimes;
-      const gradientTime = t <= 0.55 ? lerp(from, to, (t - from) / (0.55 - from)) : lerp(to, 1, (t - 0.55) / 0.45);
-      const color = sampleKeys(gradientTime, fragmentTimes, fragmentColors, mixColor);
-      const opacity = sampleKeys(t, blinkTimes, blinkValues, lerp);
+      const color = sampleKeys(t, fragmentTimes, fragmentColors, mixColor);
+      const opacity = moving ? 1 - smooth(clamp((t - 0.5) / 0.5)) : sampleKeys(t, blinkTimes, blinkValues, lerp);
       const u = particle.frame;
       renderer.draw("triangle", particle.x + particle.dx * distance, particle.y + particle.dy * distance,
-        particle.size * growth, 0, color, opacity, 1.86 * 0.53773582, 0.0001,
+        particle.size * growth, 0, color, opacity, 1, 0.0001,
         [u + 0.5 / 256, 0.5 / 128, u + 0.5 - 0.5 / 256, 1 - 0.5 / 128]);
     }
 
@@ -139,13 +127,26 @@
       uniform bool trail;
       out vec4 result;
       void main() {
-        float mask = texture(source, uv).a;
-        float alpha = mask * color.a;
         if (trail) {
-          alpha *= 1.0 - smoothstep(0.0, 1.0, lifetime);
+          float edge = length(vec2(uv.x, (uv.y - 0.5) * 2.0));
+          float fade = 1.0 - smoothstep(0.15, 1.0, lifetime);
+          float aging = smoothstep(0.38, 0.91, lifetime);
+          float coreWidth = mix(0.075, 0.035, aging);
+          float coreMask = texture(source, vec2(0.5, 0.5 + edge * 0.5 / coreWidth)).a;
+          float core = coreMask * (1.0 - smoothstep(coreWidth * 0.6, coreWidth, edge)) * fade;
+          float halo = (1.0 - smoothstep(0.0, 1.0, edge)) * exp(-1.3 * edge * edge) *
+                       (1.0 - smoothstep(0.08, 0.78, lifetime)) * fade * 0.74;
+          vec3 coreFade = vec3(aging, smoothstep(0.40, 0.67, lifetime), aging);
+          vec3 coreTint = mix(color.rgb, vec3(0.08, 0.13, 0.9), coreFade);
+          vec3 haloTint = vec3(0.14, 0.22, 2.15);
+          float alpha = core + halo * (1.0 - core);
           if (alpha < 0.0001) discard;
-        } else if (mask < dissolve) discard;
-        result = vec4(color.rgb * emission, alpha);
+          result = vec4((coreTint * core + haloTint * halo * (1.0 - core)) / alpha, alpha);
+          return;
+        }
+        float mask = texture(source, uv).a;
+        if (mask < dissolve) discard;
+        result = vec4(color.rgb * emission, mask * color.a);
       }`;
     const postVertex = `
       out vec2 uv;
@@ -315,7 +316,7 @@
       const quad = geometry(new Float32Array([-0.5, -0.5, 0, 0, 0.5, -0.5, 1, 0,
         -0.5, 0.5, 0, 1, 0.5, 0.5, 1, 1]), gl.TRIANGLE_STRIP);
       const ring = geometry(new Float32Array(ringVertices(assets.mesh)), gl.TRIANGLES);
-      const trailData = new Float32Array(maxTrailPoints * 2 * 5);
+      const trailData = new Float32Array((maxTrailPoints + 1) * 2 * 5);
       const ribbon = geometry(trailData, gl.TRIANGLE_STRIP, 5);
       const fullscreen = gl.createVertexArray();
       let background, foreground, down = [], up = [];
@@ -402,8 +403,7 @@
       }
 
       function drawTrail(points, now) {
-        const halfWidth = 0.005 * pixels * 0.5;
-        const u = 128.5 / tex.trail.width;
+        const halfWidth = 29;
         const v = 0.5 / tex.trail.height;
         const normals = [];
         for (let i = 1; i < points.length; i++) {
@@ -426,13 +426,20 @@
           const miterWidth = Math.min(halfWidth / Math.max(0.35, Math.abs(mx * next[0] + my * next[1])), halfWidth * 2);
           const { x, y, time } = points[i];
           const age = clamp((now - time) / trailLifetime);
-          trailData.set([x + mx * miterWidth, y + my * miterWidth, u, v, age,
-                         x - mx * miterWidth, y - my * miterWidth, u, 1 - v, age], i * 10);
+          trailData.set([x + mx * miterWidth, y + my * miterWidth, 0, v, age,
+                         x - mx * miterWidth, y - my * miterWidth, 0, 1 - v, age], i * 10);
         }
-        ribbon.count = points.length * 2;
+        // Extend the strip past the head so the shader can round the glow.
+        const head = points.at(-1);
+        const [nx, ny] = normals.at(-1);
+        const x = head.x + ny * halfWidth, y = head.y - nx * halfWidth;
+        const age = clamp((now - head.time) / trailLifetime);
+        trailData.set([x + nx * halfWidth, y + ny * halfWidth, 1, v, age,
+                       x - nx * halfWidth, y - ny * halfWidth, 1, 1 - v, age], points.length * 10);
+        ribbon.count = (points.length + 1) * 2;
         gl.bindBuffer(gl.ARRAY_BUFFER, ribbon.buffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, trailData, 0, ribbon.count * 5);
-        draw("trail", 0, 0, 1, 0, trailBlue, 1, 23.9686279, 0);
+        draw("trail", 0, 0, 1, 0, trailCyan, 1, 1, 0);
       }
 
       function postPass(pass, output, source, low = black, front = black) {
@@ -484,7 +491,10 @@
 
     function newTouch(x, y, now, isPersistent) {
       if (isPersistent) touches = touches.filter(touch => !touch.isPersistent);
-      const touch = { x, y, carry: 0, active: true, isPersistent, points: isPersistent ? [] : [{ x, y, time: now }] };
+      const touch = {
+        x, y, fragmentDistance: range(40, 100), active: true, isPersistent,
+        points: isPersistent ? [] : [{ x, y, time: now }]
+      };
       touches.push(touch);
       return touch;
     }
@@ -494,13 +504,23 @@
       const distance = Math.hypot(dx, dy);
       if (distance < 0.01 * pixels) return;
       touch.points.push({ x, y, time: now });
-      const expected = touch.carry + distance / pixels * 5;
-      const count = Math.min(Math.floor(expected), 64);
-      touch.carry = expected - Math.floor(expected);
-      for (let i = 1; i <= count; i++) {
-        const t = i / (count + 1);
-        moving.push(makeFragment(touch.x + dx * t, touch.y + dy * t, now, true));
+      let along = touch.fragmentDistance;
+      for (let i = 0; i < 64 && along <= distance; i++) {
+        const t = along / distance;
+        const side = Math.random() < 0.5 ? -1 : 1;
+        const nx = -dy / distance * side, ny = dx / distance * side;
+        const offset = range(12, 55);
+        moving.push({
+          x: touch.x + dx * t + nx * offset, y: touch.y + dy * t + ny * offset,
+          start: now, dx: nx, dy: ny,
+          lifetime: range(240, 400),
+          speed: range(0.04, 0.09),
+          size: range(...fragmentSize),
+          frame: Math.random() < 0.5 ? 0 : 0.5
+        });
+        along += range(80, 155);
       }
+      touch.fragmentDistance = Math.max(0, along - distance);
       touch.x = x;
       touch.y = y;
     }
@@ -509,7 +529,7 @@
       clicks.push({
         x, y, start: now,
         rings: Array.from({ length: 2 }, () => ({ size: range(0.12, 0.14), angle: range(0, turn), blend: Math.random() })),
-        fragments: Array.from({ length: 4 }, () => makeFragment(x, y, now, false))
+        fragments: Array.from({ length: 4 }, () => makeFragment(x, y, now))
       });
       requestFrame();
     }
@@ -562,7 +582,7 @@
       for (const click of clicks) {
         const t = (now - click.start) / 200;
         if (t >= 1) continue;
-        const size = 0.24 * expandingSize(t, false) * pixels * 1.34;
+        const size = 0.24 * expandingSize(t, false) * pixels * 1.34 * clickScale;
         const opacity = lerp(1, 0, (t - 0.1088) / 0.8912);
         renderer.draw("circle", click.x, click.y, size, 0, mixColor(white, flashBlue, t / (7903 / 65535)),
           opacity, 2, 0.0001);
@@ -574,12 +594,12 @@
         const dissolve = t <= 0.2 ? hermite(1, 0, 0, 0, t / 0.2, 0.2) :
           hermite(0, 1, 2.4249368, 0.27735636, (t - 0.2) / 0.8, 0.8);
         for (const ring of click.rings) {
-          renderer.draw("ring", click.x, click.y, ring.size * expandingSize(t, true) * pixels,
+          renderer.draw("ring", click.x, click.y, ring.size * expandingSize(t, true) * pixels * clickScale,
             ring.angle - ringRotation(t, ring.blend), color, 0.92, 5.992156982421875, dissolve);
         }
       }
       renderer.begin(true);
-      for (const particle of moving) drawFragment(renderer, particle, now);
+      for (const particle of moving) drawFragment(renderer, particle, now, true);
       for (const click of clicks) {
         for (const particle of click.fragments) drawFragment(renderer, particle, now);
       }
