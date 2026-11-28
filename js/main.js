@@ -44,7 +44,8 @@ const subtitleLocales = {
 	Chinese: 'zh-Hans',
 	TraditionalChinese: 'zh-Hant',
 	Japanese: 'ja',
-	Korean: 'ko'
+	Korean: 'ko',
+	Thai: 'th'
 };
 
 const CHARACTER = 'CH0070';
@@ -75,7 +76,8 @@ const AUDIO_DETAIL = [
 			Korean: [
 				"오실 줄 몰랐어요",
 				"당신은 그런 식으로 보지 않을 수도 있지만, 이런 식으로 보는 것은 여전히 놀라움입니다."
-			]
+			],
+			Thai: ["คุณครูมาถึงแล้วสินะคะ","ถึงจะดูไม่ออก แต่ฉันตกใจจริง ๆ นะคะ"]
 		}
 	},
 	{
@@ -99,7 +101,8 @@ const AUDIO_DETAIL = [
 			Korean: [
 				"나쁘지 않은 이야기가 아니죠. 너무 많은 놀라움은 재미있죠.",
 				"전까지만 해도... 내가 기대했던 일이었기 때문이죠."
-			]
+			],
+			Thai: ["เปล่าค่ะ ไม่ใช่เรื่องไม่ดีหรอก สำหรับฉันแล้ว การได้เจอเรื่องเหนือความคาดหมายเป็นเรื่องสนุกค่ะ","เพราะเป็นสิ่งที่ฉันเฝ้าหวังมานานแล้วค่ะ"]
 		}
 	},
 	{
@@ -123,7 +126,8 @@ const AUDIO_DETAIL = [
 			Korean: [
 				"그리고 이렇게,",
 				"특히 선생님이 갑자기 앞에 나타나면"
-			]
+			],
+			Thai: ["แล้วยิ่งเป็นแบบนี้...","ยิ่งได้เห็นคุณครูมาปรากฏตัวตรงหน้า ฉันก็ยิ่งรู้สึกแบบนั้นค่ะ"]
 		}
 	},
 	{
@@ -147,7 +151,8 @@ const AUDIO_DETAIL = [
 			Korean: [
 				"보여줘 오늘...",
 				"내 요청에 따라 왔어"
-			]
+			],
+			Thai: ["เอ่อ วันนี้... อ้อ จริงด้วยสินะคะ...","ฉันเป็นคนขอให้คุณครูมานี่เองค่ะ"]
 		}
 	},
 	{
@@ -176,7 +181,8 @@ const AUDIO_DETAIL = [
 				"미안해요 특별한 일이 없어요",
 				"그냥...",
 				"그냥 얘기하고 싶었어요"
-			]
+			],
+			Thai: ["ขอโทษนะคะ จริง ๆ แล้วไม่ได้มีธุระอะไรเป็นพิเศษ...","แค่...","แค่... อยากคุยกับคุณครูเท่านั้นเองค่ะ"]
 		}
 	}
 ];
@@ -288,7 +294,7 @@ function playVoiceline() {
 			track.play().catch(finish);
 
 			if (dialogBox) {
-				textbox.textContent = dialog[window.selectedLanguage][index];
+				textbox.textContent = getSubtitleText(dialog, window.selectedLanguage, index);
 				textbox.style.opacity = 1;
 			}
 		},
@@ -458,6 +464,16 @@ function setMouse(event) {
 	return { x: ax - canvas.width * positionX, y: ay - canvas.height * positionY };
 }
 
+function getSubtitleText(dialog, language, index) {
+	let text = dialog?.[language]?.[index];
+	if (text == null && language === 'Thai') {
+		language = 'English';
+		text = dialog?.[language]?.[index];
+	}
+	textbox.lang = subtitleLocales[language];
+	return text ?? "";
+}
+
 function updateSubtitleLanguage() {
 	let language = subtitleLanguagePreference;
 	if (language === 'auto') {
@@ -471,6 +487,8 @@ function updateSubtitleLanguage() {
 			language = 'Japanese';
 		} else if (primary === 'ko' || primary === 'korean' || primary === 'koreana') {
 			language = 'Korean';
+		} else if (primary === 'th' || primary === 'thai') {
+			language = 'Thai';
 		} else {
 			language = 'English';
 		}
@@ -480,7 +498,7 @@ function updateSubtitleLanguage() {
 	window.selectedLanguage = language;
 	textbox.lang = subtitleLocales[language];
 	const clip = currentTracks.at(-1);
-	if (dialogBox && clip) textbox.textContent = clip.dialog[language][clip.index];
+	if (dialogBox && clip) textbox.textContent = getSubtitleText(clip.dialog, language, clip.index);
 }
 
 function init() {
@@ -771,13 +789,28 @@ const GLARE_SLOTS = new Set([
 ]);
 const GLARE_OPACITY = 0.24;
 
-// Scale attachment opacity once so animated slot colors still control the light.
+const WINDOW_EXPOSURE = new Map([
+	['Bg', 0.90],
+	['curtain_01', 0.94],
+	['curtain_02', 0.94]
+]);
+
+// Tint these attachments once so Spine timelines retain control of slot colors and opacity.
 function applyGlareOpacity(skeletonData) {
+	const tinted = new Set();
 	for (const skin of skeletonData.skins) {
 		for (const { slotIndex, attachment } of skin.getAttachments()) {
 			const slot = skeletonData.slots[slotIndex];
-			if (!GLARE_SLOTS.has(slot.name) || slot.blendMode !== 1 || !attachment.color) continue;
-			attachment.color.a *= GLARE_OPACITY;
+			const color = attachment.color;
+			if (!color) continue;
+			const exposure = WINDOW_EXPOSURE.get(slot.name);
+			if (exposure !== undefined && !tinted.has(attachment)) {
+				color.r *= exposure;
+				color.g *= exposure;
+				color.b *= exposure;
+				tinted.add(attachment);
+			}
+			if (GLARE_SLOTS.has(slot.name) && slot.blendMode === 1) color.a *= GLARE_OPACITY;
 		}
 	}
 }

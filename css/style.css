@@ -52,3 +52,7 @@ body {
 .textbox:lang(ko) {
   font-family: 'Malgun Gothic', NotoSans, sans-serif;
 }
+
+.textbox:lang(th) {
+  font-family: 'Leelawadee UI', Tahoma, sans-serif;
+}
